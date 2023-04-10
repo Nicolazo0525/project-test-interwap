@@ -31,7 +31,7 @@ class VehiculoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'placa' => 'required|numeric',
+            'placa' => 'required|string|max:255',
             'telefono' => 'required|numeric',
             'color' => 'required|string|max:255',
             'estado' => 'required|numeric',
@@ -68,7 +68,7 @@ class VehiculoController extends Controller
     {
         $vehiculo = Vehiculo::findOrfail($id);
         $request->validate([
-            'placa' => 'required|numeric',
+            'placa' => 'required|string|max:255',
             'telefono' => 'required|numeric',
             'color' => 'required|string|max:255',
             'estado' => 'required|numeric',
@@ -88,7 +88,7 @@ class VehiculoController extends Controller
      */
     public function destroy(Vehiculo $vehiculo)
     {
-        $vehiculo->status = 0;
+        $vehiculo->estado = 0;
         $vehiculo->save();
         sleep(1);
     }
