@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\VehiculoController;
+use App\Exports\VehiculosExport;
+use App\Models\Vehiculo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Maatwebsite\Excel\Facades\Excel;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,3 +22,8 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::apiResource('vehiculos',VehiculoController::class);
+Route::get('/export',[VehiculoController::class, 'export']);
+Route::get('/exportar', function () {
+    $vehiculos = Vehiculo::all();
+    return Excel::download(new VehiculosExport($vehiculos), 'vehiculos.xlsx'); // Generar y devolver el archivo Excel
+});

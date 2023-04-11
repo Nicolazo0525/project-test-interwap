@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\VehiculosExport;
 use App\Http\Resources\VehiculoResource;
 use App\Models\Vehiculo;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;/*
+use Maatwebsite\Excel\Excel; */
+use Maatwebsite\Excel\Facades\Excel;
 
 class VehiculoController extends Controller
 {
@@ -13,16 +16,17 @@ class VehiculoController extends Controller
      */
     public function index()
     {
-        $vehiculo = Vehiculo::latest()->paginate(10);
-        return VehiculoResource::collection($vehiculo);
+        $vehiculos = Vehiculo::latest()->paginate(10);
+        return VehiculoResource::collection($vehiculos);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function export()
     {
-
+        $vehiculos = Vehiculo::latest();
+        return Excel::download(new VehiculosExport($vehiculos), 'vehiculos.xlsx');
     }
 
     /**
