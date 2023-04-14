@@ -7,7 +7,10 @@ use App\Http\Resources\VehiculoResource;
 use App\Models\Vehiculo;
 use Illuminate\Http\Request;/*
 use Maatwebsite\Excel\Excel; */
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class VehiculoController extends Controller
 {
@@ -25,7 +28,7 @@ class VehiculoController extends Controller
      */
     public function export()
     {
-        $vehiculos = Vehiculo::latest();
+        $vehiculos = Vehiculo::all();
         return Excel::download(new VehiculosExport($vehiculos), 'vehiculos.xlsx');
     }
 
@@ -47,6 +50,7 @@ class VehiculoController extends Controller
             'color' => $request->color,
             'estado' => $request->estado,
         ]);
+        return response()->json(['status'=>'Vehicle successfully created.',201]);
     }
 
     /**
@@ -85,6 +89,7 @@ class VehiculoController extends Controller
 
         $vehiculo->save();
         sleep(1);
+        return response()->json(['status'=>'Vehicle successfully edited.',201]);
     }
 
     /**

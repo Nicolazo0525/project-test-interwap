@@ -21,8 +21,12 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('vehiculos',VehiculoController::class);
-Route::get('/export',[VehiculoController::class, 'export']);
+
+/* Route::middleware(['auth', 'second'])->group(function () {
+
+}); */
+Route::apiResource('vehiculos',VehiculoController::class)/* ->middleware('vehiculo.middleware:sanctum') */;
+Route::get('/export',[VehiculoController::class, 'export'])->name('export');
 Route::get('/exportar', function () {
     $vehiculos = Vehiculo::all();
     return Excel::download(new VehiculosExport($vehiculos), 'vehiculos.xlsx'); // Generar y devolver el archivo Excel
