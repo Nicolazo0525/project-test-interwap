@@ -100,5 +100,6 @@ class VehiculoController extends Controller
         $vehiculo->estado = 0;
         $vehiculo->save();
         sleep(1);
+        return response()->json(['status'=>'Vehicle successfully delete.',201]);
     }
 }
