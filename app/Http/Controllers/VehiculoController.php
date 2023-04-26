@@ -19,8 +19,7 @@ class VehiculoController extends Controller
      */
     public function index()
     {
-        $vehiculos = Vehiculo::latest()->paginate(10);
-        return VehiculoResource::collection($vehiculos);
+
     }
 
     /**
@@ -64,9 +63,24 @@ class VehiculoController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Vehiculo $vehiculo)
+    public function search(Request $request)
     {
-        //
+        $query = $request->input('q');
+        $perPage = $request->input('perPage', 10);
+
+        if (!is_null($query)) {
+            $vehiculos = Vehiculo::where('color', 'LIKE', '%'.$query.'%')
+                                    ->orWhere('placa', 'LIKE', '%'.$query.'%')
+                                    ->orWhere('telefono', 'LIKE', '%'.$query.'%')
+                                    ->latest()
+                                    ->paginate($perPage);
+            return VehiculoResource::collection($vehiculos);
+        }
+        elseif (is_null($query)) {
+            $vehiculos = Vehiculo::latest()->paginate($perPage);
+            return VehiculoResource::collection($vehiculos);
+        }
+
     }
 
     /**
