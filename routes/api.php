@@ -25,10 +25,10 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 /* Route::middleware(['auth', 'second'])->group(function () {
 
 }); */
-Route::apiResource('vehiculos',VehiculoController::class)/* ->middleware('vehiculo.middleware:sanctum') */;
-Route::get('/export',[VehiculoController::class, 'export'])->name('export');
-Route::get('search', [VehiculoController::class, 'search']);
-Route::get('/exportar', function () {
+Route::middleware(['auth:sanctum'])->apiResource('vehiculos',VehiculoController::class)/* ->middleware('vehiculo.middleware:sanctum') */;
+Route::middleware(['auth:sanctum'])->get('/export/{user_id}',[VehiculoController::class, 'export'])->name('export');
+Route::middleware(['auth:sanctum'])->get('search/{user_id}', [VehiculoController::class, 'search']);
+Route::middleware(['auth:sanctum'])->get('/exportar', function () {
     $vehiculos = Vehiculo::all();
     return Excel::download(new VehiculosExport($vehiculos), 'vehiculos.xlsx'); // Generar y devolver el archivo Excel
 });

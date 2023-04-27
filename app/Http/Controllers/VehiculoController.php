@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\VehiculosExport;
 use App\Http\Resources\VehiculoResource;
+use App\Models\User;
 use App\Models\Vehiculo;
 use Illuminate\Http\Request;/*
 use Maatwebsite\Excel\Excel; */
@@ -25,9 +26,12 @@ class VehiculoController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function export()
+    public function export($user_id)
     {
-        $vehiculos = Vehiculo::all();
+        $user = User::findOrfail($user_id);
+        $vehiculos = Vehiculo::where('user_id', $user_id)
+                                ->select('id', 'placa', 'telefono', 'color', 'estado','created_at', 'updated_at')
+                                ->get();
         return Excel::download(new VehiculosExport($vehiculos), 'vehiculos.xlsx');
     }
 
@@ -41,6 +45,7 @@ class VehiculoController extends Controller
             'telefono' => 'required|numeric',
             'color' => 'required|string|max:255',
             'estado' => 'required|numeric',
+            'userId' => 'required|numeric',
         ]);
 
         $vehiculo = Vehiculo::create([
@@ -48,8 +53,10 @@ class VehiculoController extends Controller
             'telefono' => $request->telefono,
             'color' => $request->color,
             'estado' => $request->estado,
+            'user_id' => $request->userId,
         ]);
-        return response()->json(['status'=>'Vehicle successfully created.',201]);
+
+        return response()->json(['status'=>'Vehicle successfully created.']);
     }
 
     /**
@@ -63,13 +70,15 @@ class VehiculoController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function search(Request $request)
+    public function search($user_id, Request $request)
     {
+        $user = User::findOrfail($user_id);
         $query = $request->input('q');
         $perPage = $request->input('perPage', 10);
 
         if (!is_null($query)) {
-            $vehiculos = Vehiculo::where('color', 'LIKE', '%'.$query.'%')
+            $vehiculos = Vehiculo::where('user_id', $user->id)
+                                    ->where('color', 'LIKE', '%'.$query.'%')
                                     ->orWhere('placa', 'LIKE', '%'.$query.'%')
                                     ->orWhere('telefono', 'LIKE', '%'.$query.'%')
                                     ->latest()
@@ -77,8 +86,10 @@ class VehiculoController extends Controller
             return VehiculoResource::collection($vehiculos);
         }
         elseif (is_null($query)) {
-            $vehiculos = Vehiculo::latest()->paginate($perPage);
+            $vehiculos = Vehiculo::where('user_id', $user->id)->latest()->paginate($perPage);
             return VehiculoResource::collection($vehiculos);
+
+
         }
 
     }
@@ -94,16 +105,18 @@ class VehiculoController extends Controller
             'telefono' => 'required|numeric',
             'color' => 'required|string|max:255',
             'estado' => 'required|numeric',
+            'userId' => 'required|numeric',
         ]);
 
         $vehiculo->placa = $request->placa;
         $vehiculo->telefono = $request->telefono;
         $vehiculo->color = $request->color;
         $vehiculo->estado = $request->estado;
+        $vehiculo->user_id = $request->userId;
 
         $vehiculo->save();
         sleep(1);
-        return response()->json(['status'=>'Vehicle successfully edited.',201]);
+        return response()->json(['status'=>'Vehicle successfully edited.']);
     }
 
     /**
@@ -114,6 +127,6 @@ class VehiculoController extends Controller
         $vehiculo->estado = 0;
         $vehiculo->save();
         sleep(1);
-        return response()->json(['status'=>'Vehicle successfully delete.',201]);
+        return response()->json(['status'=>'Vehicle successfully delete.']);
     }
 }
